@@ -9,8 +9,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "absl/memory/memory.h"
-#include "absl/strings/string_view.h"
+#include "re2/stringpiece.h"
 #include "re2/filtered_re2.h"
 #include "re2/re2.h"
 #include "re2/set.h"
@@ -25,10 +24,10 @@ namespace py = pybind11;
 // a py::buffer_info in order to access the actual bytes. Under the hood,
 // the py::buffer_info manages a reference count to the py::buffer, so it
 // must be constructed and subsequently destructed while holding the GIL.
-static inline absl::string_view FromBytes(const py::buffer_info& bytes) {
+static inline re2::StringPiece FromBytes(const py::buffer_info& bytes) {
   char* data = reinterpret_cast<char*>(bytes.ptr);
   ssize_t size = bytes.size;
-  return absl::string_view(data, size);
+  return re2::StringPiece(data, size);
 }
 
 static inline int OneCharLen(const char* ptr) {
@@ -68,7 +67,7 @@ std::unique_ptr<RE2> RE2InitShim(py::buffer buffer,
                                  const RE2::Options& options) {
   auto bytes = buffer.request();
   auto pattern = FromBytes(bytes);
-  return absl::make_unique<RE2>(pattern, options);
+  return std::unique_ptr<RE2>(new RE2(pattern, options));
 }
 
 py::bytes RE2ErrorShim(const RE2& self) {
@@ -107,13 +106,13 @@ std::vector<std::pair<ssize_t, ssize_t>> RE2MatchShim(const RE2& self,
   auto bytes = buffer.request();
   auto text = FromBytes(bytes);
   const int num_groups = self.NumberOfCapturingGroups() + 1;  // need $0
-  std::vector<absl::string_view> groups;
+  std::vector<re2::StringPiece> groups;
   groups.resize(num_groups);
   py::gil_scoped_release release_gil;
   if (!self.Match(text, pos, endpos, anchor, groups.data(), groups.size())) {
     // Ensure that groups are null before converting to spans!
     for (auto& it : groups) {
-      it = absl::string_view();
+      it = re2::StringPiece();
     }
   }
   std::vector<std::pair<ssize_t, ssize_t>> spans;
@@ -195,7 +194,7 @@ class Filter {
     RE2::Options options;
     options.set_literal(true);
     options.set_case_sensitive(false);
-    set_ = absl::make_unique<RE2::Set>(options, RE2::UNANCHORED);
+    set_ = std::unique_ptr<RE2::Set>(new RE2::Set(options, RE2::UNANCHORED));
     for (int i = 0; i < static_cast<int>(atoms.size()); ++i) {
       if (set_->Add(atoms[i], /*error=*/NULL) != i) {
         // Should never happen: the atom is a literal!
