@@ -2,7 +2,14 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-import setuptools
+import os
+import sys
+from setuptools import setup
+
+# Available at setup time due to pyproject.toml
+from pybind11.setup_helpers import Pybind11Extension, build_ext
+from pybind11 import get_include
+
 
 long_description = """\
 A drop-in replacement for the re module.
@@ -30,24 +37,21 @@ Known issues with regard to building the C++ extension:
   * Building on Windows has not been tested yet and will probably fail.
 """
 
-def include_dirs():
-  try:
-    import pybind11
-    yield pybind11.get_include()
-  except ModuleNotFoundError:
-    pass
+__version__ = '0.0.7'
 
-ext_module = setuptools.Extension(
-    name='_re2',
-    sources=['_re2.cc'],
-    include_dirs=list(include_dirs()),
-    libraries=['re2'],
-    extra_compile_args=['-fvisibility=hidden'],
-)
+ext_modules = [
+    Pybind11Extension('_re2',
+        ['_re2.cc'],
+        libraries=['re2'],
+        cxx_std=11,
+        # Example: passing in the version to the compiled code
+        define_macros = [('VERSION_INFO', __version__)],
+        ),
+]
 
-setuptools.setup(
+setup(
     name='google-re2',
-    version='0.0.7',
+    version=__version__,
     description='RE2 Python bindings',
     long_description=long_description,
     long_description_content_type='text/plain',
@@ -61,8 +65,13 @@ setuptools.setup(
         'Programming Language :: C++',
         'Programming Language :: Python :: 3.6',
     ],
-    ext_modules=[ext_module],
+    ext_modules=ext_modules,
+    # Currently, build_ext only provides an optional "highest supported C++
+    # level" feature, but in the future it may provide more features.
+    cmdclass={"build_ext": build_ext},
+    zip_safe=False,
     py_modules=['re2'],
-    python_requires='~=3.6',
+    python_requires='>=3.6',
     install_requires=['six'],
+    extras_require={'test': ['pytest', 'absl-py']},
 )
