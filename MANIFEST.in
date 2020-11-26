@@ -1,0 +1,4 @@
+include README.rst LICENSE
+global-include CMakeLists.txt *.cmake
+exclude *.sh *.ini req*
+prune .git*

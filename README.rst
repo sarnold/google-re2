@@ -8,8 +8,10 @@ A drop-in replacement for the re module.
 It uses RE2 under the hood, of course, so various PCRE features
 (e.g. backreferences, look-around assertions) are not supported.
 
-..note:: The original source for this module lives on a separate branch in the
-         `RE2 library repository`_ in the ``python`` subdirectory.
+
+.. note:: The original source for this module lives on a separate branch in the
+          `RE2 library repository`_ in the ``python`` subdirectory.
+
 
 .. _RE2 library repository: https://github.com/google/re2/tree/abseil/python
 
