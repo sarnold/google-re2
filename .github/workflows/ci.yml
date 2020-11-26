@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04, macos-latest]
+        os: [ubuntu-20.04, macos-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
@@ -50,21 +50,19 @@ jobs:
       run: |
         cd C:\vcpkg
         git pull
-        .\bootstrap-vcpkg.bat
+        .\\bootstrap-vcpkg.bat
       if: startsWith(matrix.os, 'win')
 
     - name: Install deps with vcpkg
       run: |
-        pushd C:\vcpkg
-        git pull
         vcpkg install re2:x64-windows
         vcpkg integrate install
       if: startsWith(matrix.os, 'win')
 
     - name: Install deps with brew
       run: |
-        brew upgrade cmake
-        brew install re2
+        # brew cask install cmake
+        brew install -s re2
       if: startsWith(matrix.os, 'mac')
     - name: Install PPA deps
       if: runner.os == 'Linux'           
