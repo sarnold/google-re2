@@ -19,6 +19,7 @@ PLAT_TO_CMAKE = {
     "win-arm64": "ARM64",
 }
 
+fallback_ver = '0.0.7-dev'
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 class CMakeExtension(Extension):
@@ -50,22 +51,32 @@ class CMakeBuild(build_ext):
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
 
-        cfg = "Debug" if self.debug else "Release"
+        # Set a sensible default build type for packaging
+        if "CMAKE_BUILD_OVERRIDE" not in os.environ:
+            cfg = "Debug" if self.debug else "RelWithDebInfo"
+        else:
+            cfg = os.environ.get("CMAKE_BUILD_OVERRIDE", "")
 
         # CMake lets you override the generator - we need to check this.
         # Can be set with Conda-Build, for example.
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
         # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
-        # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
+        # SCM_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
         cmake_args = [
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
             "-DPYTHON_EXECUTABLE={}".format(sys.executable),
-            "-DEXAMPLE_VERSION_INFO={}".format(self.distribution.get_version()),
+            "-DSCM_VERSION_INFO={}".format(fallback_ver),
             "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
         ]
-        build_args = []
+        build_args = ['--verbose']
+
+        # CMake also lets you provide a toolchain file.
+        # Can be set in CI build environments for example.
+        cmake_toolchain_file = os.environ.get("CMAKE_TOOLCHAIN_FILE", "")
+        if cmake_toolchain_file:
+            cmake_args += ["-DCMAKE_TOOLCHAIN_FILE={}".format(cmake_toolchain_file)]
 
         if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -118,7 +129,13 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    ext_modules=[CMakeExtension("_re2")],
-    cmdclass={"build_ext": CMakeBuild},
+    use_scm_version={'root': '.',
+                     'relative_to': __file__,
+                     'fallback_version': fallback_ver,
+                     'version_scheme': 'post-release',
+                     },
+    setup_requires=['setuptools_scm'],
+    ext_modules=[CMakeExtension('_re2')],
+    cmdclass={'build_ext': CMakeBuild},
     zip_safe=False,
 )
