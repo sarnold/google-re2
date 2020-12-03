@@ -13,7 +13,7 @@ It uses RE2 under the hood, of course, so various PCRE features
 
 
 .. note:: The original source for this module lives on a separate branch in the
-          `RE2 library repository`_ in the ``python`` subdirectory.
+          `RE2 library repository`_ in the ``python`` directory.
 
 
 .. _RE2 library repository: https://github.com/google/re2/tree/abseil/python
@@ -33,9 +33,13 @@ Requirements for building the C++ extension:
 * Building requires RE2, pybind11, and cmake installed in the build
   environment.
 
-  + On Debian, install cmake, pybind11-dev, and libre2-dev packages
-  + On Gentoo, install dev-libs/re and dev-python/pybind11
-  + For a venv, install the pybind11 package from PyPI.
+  + On Ubuntu/Debian, install cmake, pybind11-dev, and libre2-dev packages
+  + On Gentoo, install dev-util/cmake and dev-python/pybind11, then
+    dev-libs/re2 `from the FreePN overlay`_
+  + For a venv you can install the pybind11 package from PyPI
+
+.. _from the FreePN overlay: https://github.com/freepn/freepn-overlay
+
 
 On MacOS, use the ``brew`` package manager::
 
