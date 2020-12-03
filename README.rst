@@ -2,8 +2,11 @@
 google-re2
 ===========
 
+.. image:: https://github.com/freepn/google-re2/workflows/ci/badge.svg
+    :target: https://github.com/freepn/google-re2/actions?query=workflow:ci
+    :alt: Action CI Status
 
-A drop-in replacement for the re module.
+A drop-in replacement for the Python re module.
 
 It uses RE2 under the hood, of course, so various PCRE features
 (e.g. backreferences, look-around assertions) are not supported.
@@ -27,10 +30,35 @@ Known differences between this API and the re module's API:
 
 Requirements for building the C++ extension:
 
-* Building requires RE2 to be installed on your system.
-  On Debian, for example, install the libre2-dev package.
-* Building requires pybind11 to be installed on your system OR venv.
-  On Debian, for example, install the pybind11-dev package.
-  For a venv, install the pybind11 package from PyPI.
-* Building on macOS has not been tested yet and will possibly fail.
-* Building on Windows has not been tested yet and will probably fail.
+* Building requires RE2, pybind11, and cmake installed in the build
+  environment.
+
+  + On Debian, install cmake, pybind11-dev, and libre2-dev packages
+  + On Gentoo, install dev-libs/re and dev-python/pybind11
+  + For a venv, install the pybind11 package from PyPI.
+
+On MacOS, use the ``brew`` package manager::
+
+  $ brew install -s re2 pybind11
+
+On Windows use the ``vcpkg`` package manager::
+
+  $ vcpkg install re2:x64-windows pybind11:x64-windows
+
+
+With at least Python 3.6 available, install ``tox`` to run the tests
+or build wheel packages using different tox environments::
+
+  $ tox  # to run tests on all available python versions
+  $ tox -e py  # to run tests on the default system python
+  $ tox -e dev  # to install in developer mode and run tests
+  $ tox -e deploy  # to build/check sdist and wheel targets
+
+
+You can pass some cmake environment variables (through tox) to alter the
+build type or pass a toolchain file (the latter is required on Windows)
+or specify the cmake generator.
+
+::
+
+  $ CMAKE_GENERATOR="Unix Makefiles" CMAKE_TOOLCHAIN_FILE=clang_toolchain.cmake tox -e deploy
