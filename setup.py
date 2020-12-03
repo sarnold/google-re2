@@ -1,33 +1,141 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright 2019 The RE2 Authors.  All Rights Reserved.
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
 import os
 import sys
-from setuptools import setup
+import subprocess
 
-# Available at setup time due to pyproject.toml
-from pybind11.setup_helpers import Pybind11Extension, build_ext
-from pybind11 import get_include
+from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
+
+# Convert distutils Windows platform specifiers to CMake -A arguments
+PLAT_TO_CMAKE = {
+    "win32": "Win32",
+    "win-amd64": "x64",
+    "win-arm32": "ARM",
+    "win-arm64": "ARM64",
+}
+
+fallback_ver = '0.0.7-1'
+
+# A CMakeExtension needs a sourcedir instead of a file list.
+class CMakeExtension(Extension):
+    def __init__(self, name, sourcedir=""):
+        Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
 
 
-__version__ = '0.0.7'
+class CMakeBuild(build_ext):
+    def run(self):
+        # This is optional - will print a nicer error if CMake is missing.
+        # Since we force CMake via PEP 518 in the pyproject.toml, this should
+        # never happen and this whole method can be removed in your code if you
+        # want.
+        try:
+            subprocess.check_output(["cmake", "--version"])
+        except OSError:
+            msg = "CMake missing - probably upgrade to a newer version of Pip?"
+            raise RuntimeError(msg)
 
-ext_modules = [
-    Pybind11Extension('_re2',
-        ['_re2.cc'],
-        libraries=['re2'],
-        cxx_std=11,
-        # Example: passing in the version to the compiled code
-        define_macros = [('VERSION_INFO', __version__)],
-        ),
-]
+        # To support Python 2, we have to avoid super(), since distutils is all
+        # old-style classes.
+        build_ext.run(self)
+
+    def build_extension(self, ext):
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+
+        # required for auto-detection of auxiliary "native" libs
+        if not extdir.endswith(os.path.sep):
+            extdir += os.path.sep
+
+        # Set a sensible default build type for packaging
+        if "CMAKE_BUILD_OVERRIDE" not in os.environ:
+            cfg = "Debug" if self.debug else "RelWithDebInfo"
+        else:
+            cfg = os.environ.get("CMAKE_BUILD_OVERRIDE", "")
+
+        # CMake lets you override the generator - we need to check this.
+        # Can be set with Conda-Build, for example.
+        cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
+
+        # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
+        # SCM_VERSION_INFO shows you how to pass a value into the C++ code
+        # from Python.
+        cmake_args = [
+            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
+            "-DPYTHON_EXECUTABLE={}".format(sys.executable),
+            "-DSCM_VERSION_INFO={}".format(fallback_ver),
+            "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
+        ]
+        build_args = ["--verbose"]
+
+        # CMake also lets you provide a toolchain file.
+        # Can be set in CI build environments for example.
+        cmake_toolchain_file = os.environ.get("CMAKE_TOOLCHAIN_FILE", "")
+        if cmake_toolchain_file:
+            cmake_args += ["-DCMAKE_TOOLCHAIN_FILE={}".format(cmake_toolchain_file)]
+
+        if self.compiler.compiler_type != "msvc":
+            # Using Ninja-build since it a) is available as a wheel and b)
+            # multithreads automatically. MSVC would require all variables be
+            # exported for Ninja to pick it up, which is a little tricky to do.
+            # Users can override the generator with CMAKE_GENERATOR in CMake
+            # 3.15+.
+            if not cmake_generator:
+                cmake_args += ["-GNinja"]
+
+        else:
+
+            # Single config generators are handled "normally"
+            single_config = any(x in cmake_generator for x in {"NMake", "Ninja"})
+
+            # CMake allows an arch-in-generator style for backward compatibility
+            contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
+
+            # Specify the arch if using MSVC generator, but only if it doesn't
+            # contain a backward-compatibility arch spec already in the
+            # generator name.
+            if not single_config and not contains_arch:
+                cmake_args += ["-A", PLAT_TO_CMAKE[self.plat_name]]
+
+            # Multi-config generators have a different way to specify configs
+            if not single_config:
+                cmake_args += [
+                    "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}".format(cfg.upper(), extdir)
+                ]
+                build_args += ["--config", cfg]
+
+        # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
+        # across all generators.
+        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
+            # self.parallel is a Python 3 only way to set parallel jobs by hand
+            # using -j in the build_ext call, not supported by pip or PyPA-build.
+            if hasattr(self, "parallel") and self.parallel:
+                # CMake 3.12+ only.
+                build_args += ["-j{}".format(self.parallel)]
+
+        if not os.path.exists(self.build_temp):
+            os.makedirs(self.build_temp)
+
+        subprocess.check_call(
+            ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
+        )
+        subprocess.check_call(
+            ["cmake", "--build", "."] + build_args, cwd=self.build_temp
+        )
+
 
 setup(
-    version=__version__,
-    ext_modules=ext_modules,
-    # Currently, build_ext only provides an optional "highest supported C++
-    # level" feature, but in the future it may provide more features.
-    cmdclass={"build_ext": build_ext},
+    use_scm_version={'root': '.',
+                     'relative_to': __file__,
+                     'fallback_version': fallback_ver,
+                     'version_scheme': 'post-release',
+                     },
+    setup_requires=['setuptools_scm'],
+    ext_modules=[CMakeExtension('_re2')],
+    cmdclass={'build_ext': CMakeBuild},
     zip_safe=False,
 )
