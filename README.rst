@@ -66,3 +66,53 @@ or specify the cmake generator.
 ::
 
   $ CMAKE_GENERATOR="Unix Makefiles" CMAKE_TOOLCHAIN_FILE=clang_toolchain.cmake tox -e deploy
+
+
+*Note about OS/platform integration* - Many Linux distribution package
+managers do not build their ``libre2`` packages using cmake and thus do
+not install the required cmake config files.  This is the reason for the
+note above about using the overlay for Gentoo, and there is also a
+corresponding PPA for Ubuntu packages (if you're using Debian you'll
+need to build the package from source).
+
+For all Ubuntu series, make sure you have the ``gpg`` and ``add-apt-repository``
+commands installed and then add the PPA:
+
+::
+
+  $ sudo apt-get install -y software-properties-common
+  $ sudo add-apt-repository -y -s ppa:nerdboy/embedded
+
+Note that on kali you will need to edit the file created under
+``/etc/apt/sources.list.d`` for the PPA and change the series name to
+``focal``, then run ``sudo apt-get update`` again.
+
+For Gentoo or derivatives based on `Portage`_, first install the portage
+overlay.
+
+Create a repos.conf file for the overlay and place the file in the
+``/etc/portage/repos.conf`` directory.  Run::
+
+  $ sudo nano /etc/portage/repos.conf/freepn-overlay.conf
+
+and add the following content to the new file::
+
+  [freepn-overlay]
+
+  # Various python ebuilds for FreePN
+  # Maintainer: nerdboy <nerdboy@gentoo.org>
+
+  location = /var/db/repos/freepn-overlay
+  sync-type = git
+  sync-uri = https://github.com/freepn/freepn-overlay.git
+  priority = 50
+  auto-sync = yes
+
+Adjust the path in the ``location`` field as needed, then save and exit nano.
+
+Run the following command to sync the repo::
+
+  $ sudo emaint sync --repo freepn-overlay
+
+
+.. _Portage: https://wiki.gentoo.org/wiki/Portage
