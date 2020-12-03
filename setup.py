@@ -19,7 +19,7 @@ PLAT_TO_CMAKE = {
     "win-arm64": "ARM64",
 }
 
-fallback_ver = '0.0.7-dev'
+fallback_ver = '0.0.7-1'
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 class CMakeExtension(Extension):
@@ -70,7 +70,7 @@ class CMakeBuild(build_ext):
             "-DSCM_VERSION_INFO={}".format(fallback_ver),
             "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
         ]
-        build_args = ['--verbose']
+        build_args = ["--verbose"]
 
         # CMake also lets you provide a toolchain file.
         # Can be set in CI build environments for example.

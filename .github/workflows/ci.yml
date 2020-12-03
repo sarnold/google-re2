@@ -20,9 +20,6 @@ jobs:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
       MACOSX_DEPLOYMENT_TARGET: "10.9"
-      #CC: gcc
-      #CXX: g++
-      #VCRE2_DIR: C:\vcpkg\packages\re2_x64-windows\
     strategy:
       fail-fast: true
       matrix:
@@ -33,11 +30,6 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-
-    #- name: Add 64-bit mingw-w64 to the PATH
-      #run: |
-        #echo "c:/msys64/bin;c:/msys64/mingw64/bin" >> $GITHUB_PATH
-      #if: startsWith(matrix.os, 'win')
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -55,7 +47,6 @@ jobs:
         cd C:\vcpkg
         git pull
         .\\bootstrap-vcpkg.bat
-        cd ${{ runner.workspace }}
       if: startsWith(matrix.os, 'win')
 
     - name: Install deps with vcpkg
@@ -81,23 +72,20 @@ jobs:
         python -m pip install --upgrade pip wheel
         pip install tox
 
-    # This makes two environment variables available in the following step(s)
+    # This makes msvc and vcpkg environment variables available in the following step(s)
     - name: Set Windows environment variables
       if: runner.os == 'Windows'
       run: |
         .github/workflows/vs_env.bat x64
         source env.sh
         echo "CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake" >> $GITHUB_ENV
-        echo $CMAKE_TOOLCHAIN_FILE
-        # echo "DISTUTILS_USE_SDK=1" >> $GITHUB_ENV
-        # echo "MSSdk=1" >> $GITHUB_ENV
 
+    # order is important here due to multiple cmake cache files left under build/
     - name: Test in place
       run: |
         tox -e py
     - name: Install and test
       run: |
-        # rm -rf build/*
         tox -e dev
     - name: Build dist pkgs
       run: |
