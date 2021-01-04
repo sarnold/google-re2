@@ -56,8 +56,8 @@ jobs:
 
     - name: Install deps with brew
       run: |
-        brew install pybind11
         brew install -s re2
+        brew install pybind11 ninja
       if: startsWith(matrix.os, 'mac')
     - name: Install PPA and build deps
       if: runner.os == 'Linux'
