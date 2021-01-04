@@ -19,7 +19,6 @@ jobs:
     env:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
-      MACOSX_DEPLOYMENT_TARGET: "10.9"
     strategy:
       fail-fast: true
       matrix:
