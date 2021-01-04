@@ -16,7 +16,7 @@ PLAT_TO_CMAKE = {
     "win-arm64": "ARM64",
 }
 
-fallback_ver = '0.0.7-1'
+fallback_ver = '0.0.7'
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 class CMakeExtension(Extension):
