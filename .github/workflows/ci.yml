@@ -42,7 +42,7 @@ jobs:
     - name: Install deps with vcpkg
       run: |
         vcpkg update
-        vcpkg install re2:x64-windows pybind11:x64-windows
+        vcpkg install re2:x64-windows
         vcpkg integrate install
       if: startsWith(matrix.os, 'win')
 
