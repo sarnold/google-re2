@@ -16,12 +16,12 @@ PLAT_TO_CMAKE = {
     "win-arm64": "ARM64",
 }
 
-fallback_ver = '0.0.7'
+fallback_ver = '0.0.7.post1'
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=""):
-        Extension.__init__(self, name, sources=[])
+        Extension.__init__(self, name, sources=[], libraries=['re2'])
         self.sourcedir = os.path.abspath(sourcedir)
 
 
@@ -126,11 +126,7 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    use_scm_version={'root': '.',
-                     'relative_to': __file__,
-                     'fallback_version': fallback_ver,
-                     'version_scheme': 'post-release',
-                     },
+    use_scm_version={'fallback_version': fallback_ver},
     setup_requires=['setuptools_scm'],
     ext_modules=[CMakeExtension('_re2')],
     cmdclass={'build_ext': CMakeBuild},

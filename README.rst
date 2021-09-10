@@ -2,8 +2,8 @@
 google-re2
 ===========
 
-.. image:: https://github.com/freepn/google-re2/workflows/ci/badge.svg
-    :target: https://github.com/freepn/google-re2/actions?query=workflow:ci
+.. image:: https://github.com/sarnold/google-re2/workflows/ci/badge.svg
+    :target: https://github.com/sarnold/google-re2/actions?query=workflow:ci
     :alt: Action CI Status
 
 A drop-in replacement for the Python re module.
@@ -35,10 +35,10 @@ Requirements for building the C++ extension:
 
   + On Ubuntu/Debian, install cmake, pybind11-dev, and libre2-dev packages
   + On Gentoo, install dev-util/cmake and dev-python/pybind11, then
-    dev-libs/re2 `from the FreePN overlay`_
+    dev-libs/re2 `from the embedded overlay`_
   + For a venv you can install the pybind11 package from PyPI
 
-.. _from the FreePN overlay: https://github.com/freepn/freepn-overlay
+.. _from the embedded overlay: https://github.com/VCTLabs/embedded-overlay
 
 
 On MacOS, use the ``brew`` package manager::
@@ -93,18 +93,18 @@ overlay.
 Create a repos.conf file for the overlay and place the file in the
 ``/etc/portage/repos.conf`` directory.  Run::
 
-  $ sudo nano /etc/portage/repos.conf/freepn-overlay.conf
+  $ sudo nano /etc/portage/repos.conf/embedded-overlay.conf
 
 and add the following content to the new file::
 
-  [freepn-overlay]
+  [embedded-overlay]
 
-  # Various python ebuilds for FreePN
+  # Various python ebuilds for embedded
   # Maintainer: nerdboy <nerdboy@gentoo.org>
 
-  location = /var/db/repos/freepn-overlay
+  location = /var/db/repos/embedded-overlay
   sync-type = git
-  sync-uri = https://github.com/freepn/freepn-overlay.git
+  sync-uri = https://github.com/VCTLabs/embedded-overlay.git
   priority = 50
   auto-sync = yes
 
@@ -112,7 +112,7 @@ Adjust the path in the ``location`` field as needed, then save and exit nano.
 
 Run the following command to sync the repo::
 
-  $ sudo emaint sync --repo freepn-overlay
+  $ sudo emaint sync --repo embedded-overlay
 
 
 .. _Portage: https://wiki.gentoo.org/wiki/Portage
