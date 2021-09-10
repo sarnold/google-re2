@@ -16,6 +16,7 @@ jobs:
     env:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
+      PIP_DOWNLOAD_CACHE: ${{ github.workspace }}/../.pip_download_cache
     strategy:
       fail-fast: true
       matrix:
@@ -38,16 +39,9 @@ jobs:
       with:
         arch: x64
 
-    - name: Update vcpkg
-      run: |
-        cd C:\vcpkg
-        git pull
-        .\\bootstrap-vcpkg.bat
-      if: startsWith(matrix.os, 'win')
-
     - name: Install deps with vcpkg
       run: |
-        .\vcpkg update
+        vcpkg update
         vcpkg install re2:x64-windows pybind11:x64-windows
         vcpkg integrate install
       if: startsWith(matrix.os, 'win')
