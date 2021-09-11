@@ -2,7 +2,7 @@
 google-re2
 ===========
 
-|smoke| |wheels|
+|smoke| |wheels| |cov|
 
 |tag| |license| |python|
 
@@ -119,12 +119,16 @@ Run the following command to sync the repo::
 
 
 .. |smoke| image:: https://github.com/sarnold/google-re2/actions/workflows/smoke.yml/badge.svg
-    :target: github.com/sarnold/google-re2/actions/workflows/smoke.yml
+    :target: https://github.com/sarnold/google-re2/actions/workflows/smoke.yml
     :alt: Smoke Test Status
 
 .. |wheels| image:: https://github.com/sarnold/google-re2/actions/workflows/wheels.yml/badge.svg
     :target: https://github.com/sarnold/google-re2/actions/workflows/wheels.yml
     :alt: Platform Wheel Status
+
+.. |cov| image:: https://raw.githubusercontent.com/sarnold/google-re2/badges/main/test-coverage.svg
+    :target: https://github.com/sarnold/google-re2/actions/workflows/coverage.yml
+    :alt: Test coverage
 
 .. |tag| image:: https://img.shields.io/github/v/tag/sarnold/google-re2?include_prereleases
     :target: https://github.com/sarnold/google-re2/releases
