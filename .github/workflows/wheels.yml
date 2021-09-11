@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.9'
+          python-version: '3.7'
 
       - name: Prepare compiler environment for Windows
         if: runner.os == 'Windows'
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.9'
+          python-version: '3.7'
 
       - name: Build sdist
         run: |
