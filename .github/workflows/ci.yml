@@ -76,10 +76,14 @@ jobs:
     # order is important here due to multiple cmake cache files left under build/
     - name: Test in place
       run: |
-        tox -e py
+        tox -e dev
+
     - name: Install and test
       run: |
-        tox -e dev
+        tox
+      env:
+        PLATFORM: ${{ matrix.os }}
+
     - name: Build dist pkgs
       run: |
         tox -e deploy
