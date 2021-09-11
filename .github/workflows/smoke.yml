@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04, macos-latest, windows-latest]
+        os: [ubuntu-20.04, macos-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
@@ -75,6 +75,7 @@ jobs:
 
     # order is important here due to multiple cmake cache files left under build/
     - name: Test in place
+      if: runner.os != 'Windows'
       run: |
         tox -e dev
 
