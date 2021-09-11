@@ -2,10 +2,10 @@
 requires = [
     "setuptools>=42",
     "wheel",
-    "setuptools_scm[toml]>=3.4",
+    "setuptools_scm[toml]>=6.2",
     "pybind11>=2.6.0",
     "ninja; sys_platform != 'Windows'",
-    "cmake>=3.12",
+    "cmake>=3.18",
 ]
 
 build-backend = "setuptools.build_meta"

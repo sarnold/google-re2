@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04, macos-latest, windows-latest]
+        os: [ubuntu-20.04, macos-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
@@ -40,17 +40,17 @@ jobs:
         arch: x64
 
     - name: Install deps with vcpkg
+      if: runner.os == 'Windows'
       run: |
         vcpkg update
-        vcpkg install re2:x64-windows pybind11:x64-windows
+        vcpkg install re2:x64-windows
         vcpkg integrate install
-      if: startsWith(matrix.os, 'win')
 
     - name: Install deps with brew
+      if: runner.os == 'macOS'
       run: |
         brew install -s re2
         brew install pybind11 ninja
-      if: startsWith(matrix.os, 'mac')
 
     - name: Install PPA and build deps
       if: runner.os == 'Linux'
@@ -63,7 +63,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip wheel
-        pip install tox
+        pip install tox tox-gh-actions
 
     # This makes msvc and vcpkg environment variables available in the following step(s)
     - name: Set Windows environment variables
@@ -75,11 +75,16 @@ jobs:
 
     # order is important here due to multiple cmake cache files left under build/
     - name: Test in place
-      run: |
-        tox -e py
-    - name: Install and test
+      if: runner.os != 'Windows'
       run: |
         tox -e dev
+
+    - name: Install and test
+      run: |
+        tox
+      env:
+        PLATFORM: ${{ matrix.os }}
+
     - name: Build dist pkgs
       run: |
         tox -e deploy

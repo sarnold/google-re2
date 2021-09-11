@@ -8,6 +8,8 @@ import subprocess
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 
+fallback_ver = '0.0.7'
+
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
     "win32": "Win32",
@@ -15,8 +17,6 @@ PLAT_TO_CMAKE = {
     "win-arm32": "ARM",
     "win-arm64": "ARM64",
 }
-
-fallback_ver = '0.0.7.post1'
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 class CMakeExtension(Extension):
@@ -130,5 +130,4 @@ setup(
     setup_requires=['setuptools_scm'],
     ext_modules=[CMakeExtension('_re2')],
     cmdclass={'build_ext': CMakeBuild},
-    zip_safe=False,
 )

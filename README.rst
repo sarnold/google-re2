@@ -2,9 +2,9 @@
 google-re2
 ===========
 
-.. image:: https://github.com/sarnold/google-re2/workflows/ci/badge.svg
-    :target: https://github.com/sarnold/google-re2/actions?query=workflow:ci
-    :alt: Action CI Status
+|smoke| |wheels|
+
+|tag| |license| |python|
 
 A drop-in replacement for the Python re module.
 
@@ -116,3 +116,25 @@ Run the following command to sync the repo::
 
 
 .. _Portage: https://wiki.gentoo.org/wiki/Portage
+
+
+.. |smoke| image:: https://github.com/sarnold/google-re2/actions/workflows/smoke.yml/badge.svg
+    :target: github.com/sarnold/google-re2/actions/workflows/smoke.yml
+    :alt: Smoke Test Status
+
+.. |wheels| image:: https://github.com/sarnold/google-re2/actions/workflows/wheels.yml/badge.svg
+    :target: https://github.com/sarnold/google-re2/actions/workflows/wheels.yml
+    :alt: Platform Wheel Status
+
+.. |tag| image:: https://img.shields.io/github/v/tag/sarnold/google-re2?include_prereleases
+    :target: https://github.com/sarnold/google-re2/releases
+    :alt: GitHub tag (latest SemVer, including pre-release)
+
+.. |license| image:: https://img.shields.io/github/license/sarnold/google-re2?color=blue
+    :target: https://opensource.org/licenses/BSD-2-Clause
+    :alt: BSD-2-Clause
+
+.. |python| image:: https://img.shields.io/badge/python-3.6+-blue.svg
+    :target: https://www.python.org/downloads/
+    :alt: Python 3
+
