@@ -51,7 +51,7 @@ jobs:
             yum install -y re2-devel ninja-build
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel show {wheel} && auditwheel repair -w {dest_dir} {wheel}"
           CIBW_BEFORE_ALL_MACOS: >
-            brew install re2 pybind11 ninja
+            brew install re2 ninja
           CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=10.09
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: "pip uninstall -y delocate && pip install git+https://github.com/Chia-Network/delocate.git && delocate-listdeps {wheel} && delocate-wheel -w {dest_dir} -v {wheel}"
           CIBW_BEFORE_ALL_WINDOWS: >
