@@ -206,6 +206,7 @@ jobs:
 
   comment_cov_change:
     name: Comment on PR with coverage delta
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-20.04
     needs: [test, base]
 
@@ -357,7 +358,7 @@ jobs:
     name: Comment on PR with generated badge
     runs-on: ubuntu-20.04
     needs: [pre_ci, badge]
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'pull_request' && github.actor == github.repository_owner }}
 
     steps:
     - name: Generate comment file with test coverage badge
