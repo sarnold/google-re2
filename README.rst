@@ -2,7 +2,9 @@
 google-re2
 ===========
 
-|smoke| |wheels| |cov|
+|smoke| |wheels| |cover|
+
+|coverage|
 
 |tag| |license| |python|
 
@@ -30,10 +32,11 @@ Known differences between this API and the re module's API:
 
 Requirements for building the C++ extension:
 
-* Building requires RE2, pybind11, and cmake installed in the build
-  environment.
+* Building from source requires a reasonably recent version of the RE2
+  shared library (at least .so version 8) and cmake (and optionally
+  pybind11) installed in the build environment. For example:
 
-  + On Ubuntu/Debian, install cmake, pybind11-dev, and libre2-dev packages
+  + On Ubuntu focal, install cmake, pybind11-dev, and libre2-dev packages
   + On Gentoo, install dev-util/cmake and dev-python/pybind11, then
     dev-libs/re2 `from the embedded overlay`_
   + For a venv you can install the pybind11 package from PyPI
@@ -54,8 +57,8 @@ With at least Python 3.6 available, install ``tox`` to run the tests
 or build wheel packages using different tox environments::
 
   $ tox  # to run tests on all available python versions
-  $ tox -e py  # to run tests on the default system python
-  $ tox -e dev  # to install in developer mode and run tests
+  $ tox -e py  # to pip install in developer mode and run tests on the default system python
+  $ tox -e dev  # to build in place and run tests (more build output)
   $ tox -e deploy  # to build/check sdist and wheel targets
 
 
@@ -65,7 +68,8 @@ or specify the cmake generator.
 
 ::
 
-  $ CMAKE_GENERATOR="Unix Makefiles" CMAKE_TOOLCHAIN_FILE=clang_toolchain.cmake tox -e deploy
+  $ CMAKE_GENERATOR="Unix Makefiles" tox -e dev
+  $ CMAKE_TOOLCHAIN_FILE="~/src/google-re2/clang_toolchain.cmake" tox -e deploy
 
 
 *Note about OS/platform integration* - Many Linux distribution package
@@ -126,9 +130,13 @@ Run the following command to sync the repo::
     :target: https://github.com/sarnold/google-re2/actions/workflows/wheels.yml
     :alt: Platform Wheel Status
 
-.. |cov| image:: https://raw.githubusercontent.com/sarnold/google-re2/badges/main/test-coverage.svg
+.. |cover| image:: https://github.com/sarnold/google-re2/actions/workflows/coverage.yml/badge.svg
     :target: https://github.com/sarnold/google-re2/actions/workflows/coverage.yml
-    :alt: Test coverage
+    :alt: Coverage Workflow Status
+
+.. |coverage| image:: https://raw.githubusercontent.com/sarnold/google-re2/badges/main/test-coverage.svg
+    :target: https://github.com/sarnold/google-re2/actions/workflows/coverage.yml
+    :alt: Test coverage percent
 
 .. |tag| image:: https://img.shields.io/github/v/tag/sarnold/google-re2?include_prereleases
     :target: https://github.com/sarnold/google-re2/releases
