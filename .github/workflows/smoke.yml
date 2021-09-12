@@ -50,7 +50,7 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew install -s re2
-        brew install pybind11 ninja
+        brew install ninja
 
     - name: Install PPA and build deps
       if: runner.os == 'Linux'

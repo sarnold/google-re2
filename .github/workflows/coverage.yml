@@ -146,7 +146,8 @@ jobs:
 
     - name: Generate coverage report
       run: |
-        tox -e py38-linux
+        tox -e py
+        .github/fix_pkg_name.sh
 
     - name: Code Coverage Summary Report (Text & Value)
       # use the fixed markdown until new upstream release
@@ -326,7 +327,7 @@ jobs:
         git config --local user.name "GitHub Action"
         mkdir -p "${BRANCH}"
         mv "${FILE}" "${BRANCH}"
-        echo "${COVERAGE}" > "${DATA}"
+        echo "${COVERAGE}" > "${BRANCH}/${DATA}"
         git add "${BRANCH}/${FILE}" "${BRANCH}/${DATA}"
         # Will give error if badge has not changed
         git commit -m "Add/Update badge" || true
