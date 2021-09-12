@@ -13,3 +13,14 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "_version.py"
 version_scheme = "python-simplified-semver"
+
+[tool.coverage.run]
+branch = true
+source = ["re2.py"]
+
+[tool.coverage.paths]
+source = ["./"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true

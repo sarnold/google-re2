@@ -1,6 +1,6 @@
 include README.rst LICENSE pyproject.toml
 global-include CMakeLists.txt *.cmake
 include *.py setup.*
-exclude *.sh req*
+exclude *.sh req* .git*
 recursive-exclude .tox *
 recursive-exclude .github *

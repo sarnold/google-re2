@@ -1,2 +1,5 @@
 pytest
 absl-py
+pytest-cov
+coverage
+coverage_python_version
